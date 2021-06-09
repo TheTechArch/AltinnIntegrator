@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AltinnIntegrator.Services.Interfaces
+namespace AltinnIntegrator.Functions.Services.Interfaces
 {
     public interface IAuthenticationService
     {

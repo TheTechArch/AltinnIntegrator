@@ -1,5 +1,5 @@
-﻿using AltinnIntegrator.Config;
-using AltinnIntegrator.Services.Interface;
+﻿using AltinnIntegrator.Functions.Config;
+using AltinnIntegrator.Functions.Services.Interface;
 using Microsoft.Extensions.Options;
 using System;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace AltinnIntegrator.Services.Implementation
+namespace AltinnIntegrator.Functions.Services.Implementation
 {
     /// <summary>
     /// Service that downloads data from platform

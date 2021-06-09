@@ -1,6 +1,6 @@
-﻿using AltinnIntegrator.Config;
-using AltinnIntegrator.Services.Interface;
-using AltinnIntegrator.Services.Interfaces;
+﻿using AltinnIntegrator.Functions.Config;
+using AltinnIntegrator.Functions.Services.Interface;
+using AltinnIntegrator.Functions.Services.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -12,7 +12,7 @@ using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace AltinnIntegrator.Services.Implementation
+namespace AltinnIntegrator.Functions.Services.Implementation
 {
     public class AuthenticationService: IAuthenticationService
     {

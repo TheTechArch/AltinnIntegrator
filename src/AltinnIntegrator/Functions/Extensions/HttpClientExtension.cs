@@ -2,7 +2,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AltinnIntegrator.Extensions
+namespace AltinnIntegrator.Functions.Extensions
 {
     /// <summary>
     /// This extension is created to make it easy to add a bearer token to a HttpRequests. 

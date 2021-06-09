@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace AltinnIntegrator.Services.Interfaces
+namespace AltinnIntegrator.Functions.Services.Interfaces
 {
     /// <summary>
     /// Interface for interacting with key vault

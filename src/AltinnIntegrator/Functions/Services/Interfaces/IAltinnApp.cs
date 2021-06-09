@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Altinn.Platform.Storage.Interface.Models;
 
-namespace AltinnIntegrator.Services.Interface
+namespace AltinnIntegrator.Functions.Services.Interface
 {
     /// <summary>
     /// Interface for handling form data related operations

@@ -1,4 +1,4 @@
-namespace AltinnIntegrator.Config
+namespace AltinnIntegrator.Functions.Config
 {
     /// <summary>
     /// Configuration object used to hold settings for the KeyVault.

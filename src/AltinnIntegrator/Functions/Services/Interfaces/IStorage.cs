@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AltinnIntegrator.Services.Interfaces
+namespace AltinnIntegrator.Functions.Services.Interfaces
 {
     interface IStorage
     {

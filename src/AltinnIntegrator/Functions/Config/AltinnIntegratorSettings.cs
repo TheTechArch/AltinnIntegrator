@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AltinnIntegrator.Config
+namespace AltinnIntegrator.Functions.Config
 {
     public class AltinnIntegratorSettings
     {

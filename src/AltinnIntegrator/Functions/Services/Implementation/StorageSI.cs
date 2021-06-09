@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using AltinnIntegrator.Config;
+using AltinnIntegrator.Functions.Config;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace AltinnIntegrator.Services.Implementation
+namespace AltinnIntegrator.Functions.Services.Implementation
 {
     /// <summary>
     /// Class that handles integration with Azure Blob Storage.

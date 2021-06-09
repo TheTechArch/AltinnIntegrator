@@ -6,16 +6,16 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Altinn.Platform.Storage.Interface.Models;
-using AltinnIntegrator.Config;
-using AltinnIntegrator.Extensions;
-using AltinnIntegrator.Services.Interface;
-using AltinnIntegrator.Services.Interfaces;
+using AltinnIntegrator.Functions.Config;
+using AltinnIntegrator.Functions.Extensions;
+using AltinnIntegrator.Functions.Services.Interface;
+using AltinnIntegrator.Functions.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
 
-namespace AltinnIntegrator.Services.Implementation
+namespace AltinnIntegrator.Functions.Services.Implementation
 {
     /// <summary>
     /// App implementation of the instance service that talks to platform storage.

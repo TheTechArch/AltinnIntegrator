@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace AltinnIntegrator.Services.Interface
+namespace AltinnIntegrator.Functions.Services.Interface
 {
     /// <summary>
     /// Interface for data handling

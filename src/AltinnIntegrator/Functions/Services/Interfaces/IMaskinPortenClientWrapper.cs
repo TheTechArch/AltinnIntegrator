@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 
-namespace AltinnIntegrator.Services.Interface
+namespace AltinnIntegrator.Functions.Services.Interface
 {
     public interface IMaskinPortenClientWrapper
     {

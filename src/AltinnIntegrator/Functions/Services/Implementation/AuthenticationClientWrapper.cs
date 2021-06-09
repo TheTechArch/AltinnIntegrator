@@ -3,16 +3,15 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AltinnIntegrator.Config;
-using AltinnIntegrator.Services.Interface;
-using Microsoft.Extensions.Configuration;
+using AltinnIntegrator.Functions.Config;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using AltinnIntegrator.Extensions;
+using AltinnIntegrator.Functions.Extensions;
+using AltinnIntegrator.Functions.Services.Interface;
 
-namespace AltinnIntegrator.Services.Implementation
+namespace AltinnIntegrator.Functions.Services.Implementation
 {
-    class AuthenticationClientWrapper : IAuthenticationClientWrapper
+    public class AuthenticationClientWrapper : IAuthenticationClientWrapper
     {
 
         private readonly HttpClient _client;
