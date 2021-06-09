@@ -25,6 +25,7 @@ namespace AltinnIntegrator.Services.Implementation
         /// </summary>
         public MaskinportenClientWrapper(IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, ILogger logger, HttpClient httpClient)
         {
+            _settings = altinnIntegratorSettings.Value;
             _logger = logger;
             httpClient.BaseAddress = new Uri(_settings.MaskinportenBaseAddress);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

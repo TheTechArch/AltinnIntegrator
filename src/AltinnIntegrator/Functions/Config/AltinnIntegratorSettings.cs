@@ -19,5 +19,10 @@ namespace AltinnIntegrator.Config
         public string StorageContainer { get; set; }
 
         public string MaskinportenBaseAddress { get; set; }
+
+
+        public string MaskinPortenClientId { get; set; }
+
+        public bool TestMode { get; set; }
     }
 }

@@ -1,11 +1,14 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
-
+using AltinnIntegrator.Config;
 using AltinnIntegrator.Services.Interface;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using AltinnIntegrator.Extensions;
 
 namespace AltinnIntegrator.Services.Implementation
 {
@@ -13,6 +16,9 @@ namespace AltinnIntegrator.Services.Implementation
     {
 
         private readonly HttpClient _client;
+
+
+        private readonly AltinnIntegratorSettings _settings;
 
         /// <summary>
         /// Application logger 
@@ -24,22 +30,26 @@ namespace AltinnIntegrator.Services.Implementation
         /// </summary>
         private string BaseAddress { get; set; }
 
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationClientWrapper" /> class.
         /// </summary>
-        public AuthenticationClientWrapper(ILogger logger)
+        public AuthenticationClientWrapper(IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, ILogger logger, HttpClient httpClient)
         {
-            BaseAddress = ApplicationManager.ApplicationConfiguration.GetSection("MaskinportenBaseAddress").Get<string>();
+            _settings = altinnIntegratorSettings.Value;
             _logger = logger;
+            httpClient.BaseAddress = new Uri(_settings.MaskinportenBaseAddress);
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+            _client = httpClient;
         }
 
         public async Task<string> ConvertToken(string token)
         {
-            string authAddress = ApplicationManager.ApplicationConfiguration.GetSection("AuthBaseAddress").Get<string>();
-            HttpClientWrapper httpClientWrapper = new HttpClientWrapper(_logger);
-
             AuthenticationHeaderValue headers = new AuthenticationHeaderValue("Bearer", token);
-            HttpResponseMessage response = await httpClientWrapper.GetCommand(authAddress, cmd, headers);
+
+            string cmd = $@"exchange/maskinporten?test={_settings.TestMode}";
+            HttpResponseMessage response = await _client.GetAsync(token,cmd);
 
             if (response.IsSuccessStatusCode)
             {

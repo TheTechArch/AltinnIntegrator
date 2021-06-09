@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Altinn.Platform.Storage.Interface.Models;
 using AltinnIntegrator.Config;
+using AltinnIntegrator.Extensions;
 using AltinnIntegrator.Services.Interface;
 using AltinnIntegrator.Services.Interfaces;
 using Microsoft.Extensions.Logging;

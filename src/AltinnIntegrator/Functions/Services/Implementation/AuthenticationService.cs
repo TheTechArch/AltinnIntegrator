@@ -71,7 +71,7 @@ namespace AltinnIntegrator.Services.Implementation
         public async Task<string> GetJwtAssertion()
         {
             DateTimeOffset dateTimeOffset = new DateTimeOffset(DateTime.UtcNow);
-            Guid clientId = (Guid) _keyVaultSettings. GetOptionValue("clientid");
+            Guid clientId = new Guid(_altinnIntegratorSettings.MaskinPortenClientId);
 
             var cert = await GetCertificateFromKeyVault();
 
