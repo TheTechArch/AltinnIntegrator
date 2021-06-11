@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AltinnIntegrator.Functions.Services.Interface
 {
     public interface IMaskinPortenClientWrapper
     {
-        bool PostToken(FormUrlEncodedContent bearer, out string token); 
+        Task<string> PostToken(FormUrlEncodedContent bearer); 
     }
 }

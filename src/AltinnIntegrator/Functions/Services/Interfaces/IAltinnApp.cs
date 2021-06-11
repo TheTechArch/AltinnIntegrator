@@ -13,7 +13,7 @@ namespace AltinnIntegrator.Functions.Services.Interface
         /// <summary>
         /// Gets the instance metadata for a given app
         /// </summary>
-        Task<Instance> GetInstance(string app, string org, int instanceOwnerPartyId, Guid instanceId);
+        Task<Instance> GetInstance(string appId, string instanceId);
         
         /// <summary>
         /// Add complete confirmation.

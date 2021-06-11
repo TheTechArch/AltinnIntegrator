@@ -1,22 +1,32 @@
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Altinn.Platform.Events.Functions.Models;
+using AltinnIntegrator.Functions.Services.Implementation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+
 
 namespace Functions
 {
     /// <summary>
     /// This function is responsible for receving events from Altinn Events.
-    /// It will store events 
+    /// It will store events in the incomming que for processing by the EventsProcessor
     /// </summary>
-    public static class EventsReceiver
+    public  class EventsReceiver
     {
-        [FunctionName("Function1")]
-        public static async Task<IActionResult> Run(
+        private readonly IQueueService _queueService;
+
+        public EventsReceiver(IQueueService queueSerice)
+        {
+            _queueService = queueSerice;
+        }
+
+        [FunctionName("EventsReceiver")]
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -25,8 +35,10 @@ namespace Functions
             string name = req.Query["name"];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            CloudEvent cloudEvent = JsonSerializer.Deserialize<CloudEvent>(requestBody);
+
+
+            await _queueService.PushToQueue(JsonSerializer.Serialize(cloudEvent));
 
             string responseMessage = string.IsNullOrEmpty(name)
                 ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."

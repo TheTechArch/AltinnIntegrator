@@ -42,17 +42,17 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             string jwtAssertion = await GetJwtAssertion();
 
             FormUrlEncodedContent content = GetUrlEncodedContent(jwtAssertion);
-            if (_maskinportenClientWrapper.PostToken(content, out string token))
+            string maskinPortenToken = await _maskinportenClientWrapper.PostToken(content);
+            
+            if (!string.IsNullOrEmpty(maskinPortenToken))
             {
-                if (!string.IsNullOrEmpty(token))
-                {
-                    var accessTokenObject = JsonConvert.DeserializeObject<JObject>(token);
+                var accessTokenObject = JsonConvert.DeserializeObject<JObject>(maskinPortenToken);
 
-                    string altinnToken = await _authenticationClientWrapper.ConvertToken(accessTokenObject.GetValue("access_token").ToString());
+                string altinnToken = await _authenticationClientWrapper.ConvertToken(accessTokenObject.GetValue("access_token").ToString());
 
-                    return altinnToken;
-                }
+                return altinnToken;
             }
+            
 
             return null;
         }
@@ -73,7 +73,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             DateTimeOffset dateTimeOffset = new DateTimeOffset(DateTime.UtcNow);
             Guid clientId = new Guid(_altinnIntegratorSettings.MaskinPortenClientId);
 
-            var cert = await GetCertificateFromKeyVault();
+            X509Certificate2 cert = GetCertificateFromKeyStore("111bd85e12ef3dce6ec7b2c0011d4e9cbc4f896f", StoreName.My, StoreLocation.LocalMachine);
 
             X509SecurityKey securityKey = new X509SecurityKey(cert);
             JwtHeader header = new JwtHeader(new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256))
@@ -83,7 +83,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             header.Remove("typ");
             header.Remove("kid");
 
-            var payload = new JwtPayload
+            JwtPayload payload = new JwtPayload
             {
                 { "aud", "https://ver2.maskinporten.no/" },
                 { "resource", "https://tt02.altinn.no/maskinporten-api/" },
@@ -94,8 +94,8 @@ namespace AltinnIntegrator.Functions.Services.Implementation
                 { "jti", Guid.NewGuid().ToString() },
             };
 
-            var securityToken = new JwtSecurityToken(header, payload);
-            var handler = new JwtSecurityTokenHandler();
+            JwtSecurityToken securityToken = new JwtSecurityToken(header, payload);
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
 
             return handler.WriteToken(securityToken);
         }
@@ -105,6 +105,23 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             string certBase64 = await _keyVaultService.GetCertificateAsync(_keyVaultSettings.KeyVaultURI, _keyVaultSettings.MaskinPortenCertSecretId);
             return new X509Certificate2(Convert.FromBase64String(certBase64), (string)null, X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
        }
+
+
+
+        private static X509Certificate2 GetCertificateFromKeyStore(string thumbprint, StoreName storeName, StoreLocation storeLocation, bool onlyValid = false)
+        {
+            var store = new X509Store(storeName, storeLocation);
+            store.Open(OpenFlags.ReadOnly);
+            var certCollection = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, onlyValid);
+            var enumerator = certCollection.GetEnumerator();
+            X509Certificate2 cert = null;
+            while (enumerator.MoveNext())
+            {
+                cert = enumerator.Current;
+            }
+
+            return cert;
+        }
 
     }
 }

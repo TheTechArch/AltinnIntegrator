@@ -45,11 +45,9 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         }
 
         /// <inheritdoc />
-        public async Task<Instance> GetInstance(string app, string org, int instanceOwnerId, Guid instanceGuid)
+        public async Task<Instance> GetInstance(string appId, string instanceId)
         {
-            string instanceIdentifier = $"{instanceOwnerId}/{instanceGuid}";
-
-            string apiUrl = $"instances/{instanceIdentifier}";
+            string apiUrl = $"/{appId}/instances/{instanceId}";
 
             string altinnToken = await _authenticationService.GetAltinnToken();
             
@@ -62,23 +60,12 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             }
             else
             {
-                _logger.LogError($"Unable to fetch instance with instance id {instanceGuid}");
+                _logger.LogError($"Unable to fetch instance with instance id {instanceId}");
                 throw new ApplicationException();
             }
         }
 
-        /// <inheritdoc />
-        public async Task<Instance> GetInstance(Instance instance)
-        {
-            string app = instance.AppId.Split("/")[1];
-            string org = instance.Org;
-            int instanceOwnerId = int.Parse(instance.InstanceOwner.PartyId);
-            Guid instanceGuid = Guid.Parse(instance.Id.Split("/")[1]);
-
-            return await GetInstance(app, org, instanceOwnerId, instanceGuid);
-        }
-     
-        /// <inheritdoc/>
+         /// <inheritdoc/>
         public async Task<Instance> AddCompleteConfirmation(int instanceOwnerPartyId, Guid instanceGuid)
         {
             string apiUrl = $"instances/{instanceOwnerPartyId}/{instanceGuid}/complete";

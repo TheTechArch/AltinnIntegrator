@@ -23,22 +23,34 @@ namespace AltinnIntegrator.Functions
         /// </summary>
         public void Configure(IWebJobsBuilder builder)
         {
+            builder.Services.AddLogging();
             builder.Services.AddOptions<AltinnIntegratorSettings>()
             .Configure<IConfiguration>((settings, configuration) =>
             {
-                configuration.GetSection("AltinnIntegrator").Bind(settings);
+                configuration.GetSection("AltinnIntegratorSettings").Bind(settings);
             });
             builder.Services.AddOptions<KeyVaultSettings>()
             .Configure<IConfiguration>((settings, configuration) =>
             {
                 configuration.GetSection("KeyVault").Bind(settings);
             });
-               
-            builder.Services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
-            builder.Services.AddSingleton<IKeyVaultService, KeyVaultService>();
-            builder.Services.AddSingleton<IAuthenticationClientWrapper, AuthenticationClientWrapper>();
+
+            builder.Services.AddOptions<QueueStorageSettings>()
+            .Configure<IConfiguration>((settings, configuration) =>
+            {
+                configuration.GetSection("QueueStorageSettings").Bind(settings);
+            });
+
+            builder.Services.AddTransient<ITelemetryInitializer, TelemetryInitializer>();
+            builder.Services.AddTransient<IKeyVaultService, KeyVaultService>();
+            builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddTransient<IAuthenticationClientWrapper, AuthenticationClientWrapper>();
+            builder.Services.AddTransient<IQueueService, QueueService>();
+            builder.Services.AddTransient<IAltinnApp, AltinnAppSI>();
+            builder.Services.AddTransient<IPlatform, PlatformSI>();
             builder.Services.AddHttpClient<IAuthenticationClientWrapper, AuthenticationClientWrapper>();
             builder.Services.AddHttpClient<IMaskinPortenClientWrapper, MaskinportenClientWrapper>();
+            
         }
     }
 }

@@ -13,16 +13,9 @@ namespace AltinnIntegrator.Functions.Services.Implementation
 {
     public class AuthenticationClientWrapper : IAuthenticationClientWrapper
     {
-
         private readonly HttpClient _client;
 
-
         private readonly AltinnIntegratorSettings _settings;
-
-        /// <summary>
-        /// Application logger 
-        /// </summary>
-        protected static ILogger _logger;
 
         /// <summary>
         /// Gets or sets the base address
@@ -33,11 +26,10 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationClientWrapper" /> class.
         /// </summary>
-        public AuthenticationClientWrapper(IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, ILogger logger, HttpClient httpClient)
+        public AuthenticationClientWrapper(IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, HttpClient httpClient)
         {
             _settings = altinnIntegratorSettings.Value;
-            _logger = logger;
-            httpClient.BaseAddress = new Uri(_settings.MaskinportenBaseAddress);
+            httpClient.BaseAddress = new Uri(_settings.PlatformBaseUrl);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
             _client = httpClient;
@@ -47,7 +39,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         {
             AuthenticationHeaderValue headers = new AuthenticationHeaderValue("Bearer", token);
 
-            string cmd = $@"exchange/maskinporten?test={_settings.TestMode}";
+            string cmd = $@"authentication/api/v1/exchange/maskinporten?test={_settings.TestMode}";
             HttpResponseMessage response = await _client.GetAsync(token,cmd);
 
             if (response.IsSuccessStatusCode)
