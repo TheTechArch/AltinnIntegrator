@@ -23,10 +23,9 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationClientWrapper" /> class.
         /// </summary>
-        public MaskinportenClientWrapper(IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, ILogger<MaskinportenClientWrapper> logger, HttpClient httpClient)
+        public MaskinportenClientWrapper(IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, HttpClient httpClient)
         {
             _settings = altinnIntegratorSettings.Value;
-            _logger = logger;
             httpClient.BaseAddress = new Uri(_settings.MaskinportenBaseAddress);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
@@ -41,8 +40,15 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         public async Task<string> PostToken(FormUrlEncodedContent bearer)
         {
             string token = string.Empty;
-           
-            HttpResponseMessage response = await _client.PostAsync("/token", bearer);
+
+            HttpRequestMessage requestMessage = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(_settings.MaskinportenBaseAddress + "/token"),
+                Content = bearer
+            };
+
+            HttpResponseMessage response = await _client.SendAsync(requestMessage);
 
             if (response.IsSuccessStatusCode)
             {
@@ -52,7 +58,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             else
             {
                 string error = await response.Content.ReadAsStringAsync();
-                _logger.LogError( @"Could not retrieve Token" + error);
+                // _logger.LogError( @"Could not retrieve Token" + error);
             }
 
             return null;

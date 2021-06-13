@@ -37,7 +37,6 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         public AltinnAppSI(IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, HttpClient httpClient, IAuthenticationService authenticationService)
         {
             _settings = altinnIntegratorSettings.Value;
-            httpClient.BaseAddress = new Uri(_settings.AppsBaseUrl);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
             _client = httpClient;
@@ -47,7 +46,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         /// <inheritdoc />
         public async Task<Instance> GetInstance(string appId, string instanceId)
         {
-            string apiUrl = $"/{appId}/instances/{instanceId}";
+            string apiUrl = $"{_settings.AppsBaseUrl}/{appId}/instances/{instanceId}";
 
             string altinnToken = await _authenticationService.GetAltinnToken();
             
@@ -60,7 +59,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             }
             else
             {
-                _logger.LogError($"Unable to fetch instance with instance id {instanceId}");
+                //_logger.LogError($"Unable to fetch instance with instance id {instanceId}");
                 throw new ApplicationException();
             }
         }

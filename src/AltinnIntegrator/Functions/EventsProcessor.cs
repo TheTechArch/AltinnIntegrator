@@ -1,9 +1,11 @@
 using System;
+using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Altinn.Platform.Events.Functions.Models;
 using Altinn.Platform.Storage.Interface.Models;
 using AltinnIntegrator.Functions.Services.Interface;
+using AltinnIntegrator.Functions.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
@@ -14,23 +16,34 @@ namespace AltinnIntegrator.Functions
     {
         private readonly IAltinnApp _altinnApp;
 
-        public EventsProcessor(IAltinnApp altinnApp)
+        private readonly IPlatform _platform;
+
+        private readonly IStorage _storage;
+
+        public EventsProcessor(IAltinnApp altinnApp, IPlatform platform, IStorage storage )
         {
             _altinnApp = altinnApp;
+            _platform = platform;
+            _storage = storage;
         }
 
 
         [FunctionName("EventsProcessor")]
         public async Task Run([QueueTrigger("events-inbound", Connection = "QueueStorage")] string item, ILogger log)
         {
-            CloudEvent cloudEvent = JsonSerializer.Deserialize<CloudEvent>(item);
+            CloudEvent cloudEvent = System.Text.Json.JsonSerializer.Deserialize<CloudEvent>(item);
             if(ShouldProcessEvent(cloudEvent))
             {
                Instance instance = CreateInstanceFromSource(cloudEvent);
                instance = await _altinnApp.GetInstance(instance.AppId, instance.Id);
-                foreach(DataElement data in instance.Data)
+                await _storage.SaveBlob(instance.Id, JsonSerializer.Serialize(instance));
+                foreach (DataElement data in instance.Data)
                 {
                     ResourceLinks links = data.SelfLinks;
+                    using (Stream stream = await _platform.GetBinaryData(links.Platform))
+                    {
+                        await _storage.UploadFromStreamAsync(stream, data.BlobStoragePath);
+                    }
                 }
             }
         }

@@ -29,7 +29,6 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         public AuthenticationClientWrapper(IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, HttpClient httpClient)
         {
             _settings = altinnIntegratorSettings.Value;
-            httpClient.BaseAddress = new Uri(_settings.PlatformBaseUrl);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
             _client = httpClient;
@@ -37,9 +36,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
 
         public async Task<string> ConvertToken(string token)
         {
-            AuthenticationHeaderValue headers = new AuthenticationHeaderValue("Bearer", token);
-
-            string cmd = $@"authentication/api/v1/exchange/maskinporten?test={_settings.TestMode}";
+            string cmd = $@"{_settings.PlatformBaseUrl}authentication/api/v1/exchange/maskinporten?test={_settings.TestMode}";
             HttpResponseMessage response = await _client.GetAsync(token,cmd);
 
             if (response.IsSuccessStatusCode)

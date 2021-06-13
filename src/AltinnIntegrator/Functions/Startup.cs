@@ -43,11 +43,11 @@ namespace AltinnIntegrator.Functions
 
             builder.Services.AddTransient<ITelemetryInitializer, TelemetryInitializer>();
             builder.Services.AddTransient<IKeyVaultService, KeyVaultService>();
-            builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
-            builder.Services.AddTransient<IAuthenticationClientWrapper, AuthenticationClientWrapper>();
+            builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
             builder.Services.AddTransient<IQueueService, QueueService>();
             builder.Services.AddTransient<IAltinnApp, AltinnAppSI>();
             builder.Services.AddTransient<IPlatform, PlatformSI>();
+            builder.Services.AddSingleton<IStorage, StorageSI>();
             builder.Services.AddHttpClient<IAuthenticationClientWrapper, AuthenticationClientWrapper>();
             builder.Services.AddHttpClient<IMaskinPortenClientWrapper, MaskinportenClientWrapper>();
             

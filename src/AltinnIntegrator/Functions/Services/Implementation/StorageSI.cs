@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using AltinnIntegrator.Functions.Config;
+using AltinnIntegrator.Functions.Services.Interfaces;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -13,7 +14,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
     /// <summary>
     /// Class that handles integration with Azure Blob Storage.
     /// </summary>
-    public class StorageSI
+    public class StorageSI: IStorage
     {
         private readonly AltinnIntegratorSettings _settings;
 
@@ -47,7 +48,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             stream.Dispose();
         }
 
-        private async Task<long> UploadFromStreamAsync(Stream stream, string fileName)
+        public async Task<long> UploadFromStreamAsync(Stream stream, string fileName)
         {
             BlobClient blockBlob = CreateBlobClient(fileName);
 

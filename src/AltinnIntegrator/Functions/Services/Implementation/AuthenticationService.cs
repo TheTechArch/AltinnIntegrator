@@ -21,6 +21,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         private readonly AltinnIntegratorSettings _altinnIntegratorSettings;
         private readonly IMaskinPortenClientWrapper _maskinportenClientWrapper;
         private readonly IAuthenticationClientWrapper _authenticationClientWrapper;
+        private string _altinnToken;
 
         public AuthenticationService(
             IKeyVaultService keyVaultService, 
@@ -39,6 +40,11 @@ namespace AltinnIntegrator.Functions.Services.Implementation
 
         public async Task<string> GetAltinnToken()
         {
+            if(!string.IsNullOrEmpty(_altinnToken))
+            {
+                return _altinnToken;
+            }
+
             string jwtAssertion = await GetJwtAssertion();
 
             FormUrlEncodedContent content = GetUrlEncodedContent(jwtAssertion);
