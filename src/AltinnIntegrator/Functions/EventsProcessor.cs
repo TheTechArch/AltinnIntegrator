@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Altinn.Platform.Events.Functions.Models;
 using Altinn.Platform.Storage.Interface.Models;
+using AltinnIntegrator.Functions.Services.Implementation;
 using AltinnIntegrator.Functions.Services.Interface;
 using AltinnIntegrator.Functions.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
@@ -20,23 +21,35 @@ namespace AltinnIntegrator.Functions
 
         private readonly IStorage _storage;
 
-        public EventsProcessor(IAltinnApp altinnApp, IPlatform platform, IStorage storage )
+        private readonly IQueueService _queueService;
+
+        public EventsProcessor(
+            IAltinnApp altinnApp, 
+            IPlatform platform, 
+            IStorage storage,
+            IQueueService queueService)
         {
             _altinnApp = altinnApp;
             _platform = platform;
             _storage = storage;
+            _queueService = queueService;
         }
 
-
+        /// <summary>
+        /// Reads cloud event from events-inbound queue and download instance and data for that given event and store it to configured azure storage
+        /// </summary>
         [FunctionName("EventsProcessor")]
         public async Task Run([QueueTrigger("events-inbound", Connection = "QueueStorage")] string item, ILogger log)
         {
             CloudEvent cloudEvent = System.Text.Json.JsonSerializer.Deserialize<CloudEvent>(item);
-            if(ShouldProcessEvent(cloudEvent))
+            if (ShouldProcessEvent(cloudEvent))
             {
-               Instance instance = CreateInstanceFromSource(cloudEvent);
-               instance = await _altinnApp.GetInstance(instance.AppId, instance.Id);
-                await _storage.SaveBlob(instance.Id, JsonSerializer.Serialize(instance));
+                Instance instance = CreateInstanceFromSource(cloudEvent);
+                instance = await _altinnApp.GetInstance(instance.AppId, instance.Id);
+
+                string instanceGuid = instance.Id.Split("/")[1];
+                string instancePath = instance.AppId + "/" + instanceGuid + "/" + instanceGuid;
+                await _storage.SaveBlob(instancePath, JsonSerializer.Serialize(instance));
                 foreach (DataElement data in instance.Data)
                 {
                     ResourceLinks links = data.SelfLinks;
@@ -45,10 +58,14 @@ namespace AltinnIntegrator.Functions
                         await _storage.UploadFromStreamAsync(stream, data.BlobStoragePath);
                     }
                 }
+
+                await _queueService.PushToConfirmationQueue(JsonSerializer.Serialize(cloudEvent));
             }
         }
 
-
+        /// <summary>
+        /// Creates an instance for a given event
+        /// </summary>
         private Instance CreateInstanceFromSource(CloudEvent cloudEvent)
         {
             Instance instance = new Instance();
@@ -60,15 +77,12 @@ namespace AltinnIntegrator.Functions
             return instance;
         }
 
+        /// <summary>
+        ///  Will based on configuration decide if the event need to be processed. Todo add logic
+        /// </summary>
         private bool ShouldProcessEvent(CloudEvent cloudEvent)
         {
             return true;
         }
-
-        private async Task GetDataForInstance(string source)
-        {
-
-        }
-
     }
 }

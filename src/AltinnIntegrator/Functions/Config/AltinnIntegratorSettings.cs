@@ -24,5 +24,7 @@ namespace AltinnIntegrator.Functions.Config
         public string MaskinPortenClientId { get; set; }
 
         public bool TestMode { get; set; }
+
+        public string LocalCertThumbprint { get; set; }
     }
 }

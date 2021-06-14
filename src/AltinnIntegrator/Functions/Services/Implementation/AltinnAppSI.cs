@@ -18,13 +18,16 @@ using Newtonsoft.Json;
 namespace AltinnIntegrator.Functions.Services.Implementation
 {
     /// <summary>
-    /// App implementation of the instance service that talks to platform storage.
+    /// App implementation of the instance service that talks to the given app
     /// </summary>
     public class AltinnAppSI : IAltinnApp
     {
         private readonly ILogger _logger;
-         private readonly HttpClient _client;
+        
+        private readonly HttpClient _client;
+        
         private readonly AltinnIntegratorSettings _settings;
+        
         private readonly IAuthenticationService _authenticationService;
 
         /// <summary>
@@ -34,7 +37,11 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         /// <param name="logger">the logger</param>
         /// <param name="httpClient">A HttpClient that can be used to perform HTTP requests against the platform.</param>
         /// <param name="settings">The application settings.</param>
-        public AltinnAppSI(IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, HttpClient httpClient, IAuthenticationService authenticationService)
+        public AltinnAppSI(
+            IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, 
+            HttpClient httpClient, 
+            IAuthenticationService authenticationService
+            )
         {
             _settings = altinnIntegratorSettings.Value;
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

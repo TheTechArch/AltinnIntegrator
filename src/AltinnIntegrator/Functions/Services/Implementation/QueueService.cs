@@ -20,6 +20,8 @@ namespace AltinnIntegrator.Functions.Services.Implementation
 
         private QueueClient _inboundQueueClient;
 
+        private QueueClient _confirmationQueueClient;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="QueueService"/> class.
         /// </summary>
@@ -30,7 +32,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         }
 
         /// <inheritdoc/>
-        public async Task<PushQueueReceipt> PushToQueue(string content)
+        public async Task<PushQueueReceipt> PushToInboundQueue(string content)
         {
             if (!_settings.EnablePushToQueue)
             {
@@ -50,6 +52,26 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             return new PushQueueReceipt { Success = true };
         }
 
+        public async Task<PushQueueReceipt> PushToConfirmationQueue(string content)
+        {
+            if (!_settings.EnablePushToQueue)
+            {
+                return new PushQueueReceipt { Success = true };
+            }
+
+            try
+            {
+                QueueClient client = await GetConfirmationQueueClient();
+                await client.SendMessageAsync(Convert.ToBase64String(Encoding.UTF8.GetBytes(content)));
+            }
+            catch (Exception e)
+            {
+                return new PushQueueReceipt { Success = false, Exception = e };
+            }
+
+            return new PushQueueReceipt { Success = true };
+        }
+
         private async Task<QueueClient> GetInboundQueueClient()
         {
             if (_inboundQueueClient == null)
@@ -59,6 +81,17 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             }
 
             return _inboundQueueClient;
+        }
+
+        private async Task<QueueClient> GetConfirmationQueueClient()
+        {
+            if (_confirmationQueueClient == null)
+            {
+                _confirmationQueueClient = new QueueClient(_settings.ConnectionString, _settings.ConfirmationQueueName);
+                await _confirmationQueueClient.CreateIfNotExistsAsync();
+            }
+
+            return _confirmationQueueClient;
         }
 
     }

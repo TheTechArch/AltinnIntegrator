@@ -16,6 +16,11 @@ namespace AltinnIntegrator.Functions.Config
         public string InboundQueueName { get; set; }
 
         /// <summary>
+        /// Name of the queue to push confirmation
+        /// </summary>
+        public string ConfirmationQueueName { get; set; }
+
+        /// <summary>
         /// Indicated if events should be pushed to queue.
         /// </summary>
         public bool EnablePushToQueue { get; set; }

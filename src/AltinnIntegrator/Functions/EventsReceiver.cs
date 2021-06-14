@@ -38,7 +38,7 @@ namespace Functions
             CloudEvent cloudEvent = JsonSerializer.Deserialize<CloudEvent>(requestBody);
 
 
-            await _queueService.PushToQueue(JsonSerializer.Serialize(cloudEvent));
+            await _queueService.PushToInboundQueue(JsonSerializer.Serialize(cloudEvent));
 
             string responseMessage = string.IsNullOrEmpty(name)
                 ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."

@@ -22,6 +22,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         private readonly IMaskinPortenClientWrapper _maskinportenClientWrapper;
         private readonly IAuthenticationClientWrapper _authenticationClientWrapper;
         private string _altinnToken;
+        private DateTime _tokenTimeout; 
 
         public AuthenticationService(
             IKeyVaultService keyVaultService, 
@@ -40,7 +41,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
 
         public async Task<string> GetAltinnToken()
         {
-            if(!string.IsNullOrEmpty(_altinnToken))
+            if(!string.IsNullOrEmpty(_altinnToken) && _tokenTimeout > DateTime.Now)
             {
                 return _altinnToken;
             }
@@ -56,6 +57,8 @@ namespace AltinnIntegrator.Functions.Services.Implementation
 
                 string altinnToken = await _authenticationClientWrapper.ConvertToken(accessTokenObject.GetValue("access_token").ToString());
 
+                _altinnToken = altinnToken;
+                _tokenTimeout = DateTime.Now.AddSeconds(9);
                 return altinnToken;
             }
             
@@ -74,12 +77,24 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             return formContent;
         }
 
+        /// <summary>
+        /// Creates the JWT Assertion used to authenticate system in Maskinporten
+        /// </summary>
+        /// <returns></returns>
         public async Task<string> GetJwtAssertion()
         {
             DateTimeOffset dateTimeOffset = new DateTimeOffset(DateTime.UtcNow);
             Guid clientId = new Guid(_altinnIntegratorSettings.MaskinPortenClientId);
 
-            X509Certificate2 cert = GetCertificateFromKeyStore("111bd85e12ef3dce6ec7b2c0011d4e9cbc4f896f", StoreName.My, StoreLocation.LocalMachine);
+            X509Certificate2 cert = null;
+            if (!string.IsNullOrEmpty(_altinnIntegratorSettings.LocalCertThumbprint))
+            {
+               cert = GetCertificateFromKeyStore("111bd85e12ef3dce6ec7b2c0011d4e9cbc4f896f", StoreName.My, StoreLocation.LocalMachine);
+            }
+            else
+            {
+                cert = await GetCertificateFromKeyVault();
+            }
 
             X509SecurityKey securityKey = new X509SecurityKey(cert);
             JwtHeader header = new JwtHeader(new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256))
