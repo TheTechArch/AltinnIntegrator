@@ -14,7 +14,7 @@ namespace AltinnIntegrator.Functions.Services.Interface
         /// Gets the instance metadata for a given app
         /// </summary>
         Task<Instance> GetInstance(string appId, string instanceId);
-        
+
         /// <summary>
         /// Add complete confirmation.
         /// </summary>
@@ -23,10 +23,6 @@ namespace AltinnIntegrator.Functions.Services.Interface
         /// collected all the data and information they needed from the instance and expect no additional data to be added to it.
         /// The body of the request isn't used for anything despite this being a POST operation.
         /// </remarks>
-        /// <param name="instanceOwnerPartyId">The party id of the instance owner.</param>
-        /// <param name="instanceGuid">The id of the instance to confirm as complete.</param>
-        /// <returns>Returns the updated instance.</returns>
-        Task<Instance> AddCompleteConfirmation(string app, string org, int instanceOwnerPartyId, Guid instanceGuid);
-
+        Task<Instance> AddCompleteConfirmation(string instanceUri);
     }
 }

@@ -72,9 +72,9 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         }
 
          /// <inheritdoc/>
-        public async Task<Instance> AddCompleteConfirmation(int instanceOwnerPartyId, Guid instanceGuid)
+        public async Task<Instance> AddCompleteConfirmation(string instanceUri)
         {
-            string apiUrl = $"instances/{instanceOwnerPartyId}/{instanceGuid}/complete";
+            string apiUrl = $"{instanceUri}/complete";
             string altinnToken = await _authenticationService.GetAltinnToken(); 
 
             HttpResponseMessage response = await _client.PostAsync(altinnToken, apiUrl, new StringContent(string.Empty));
@@ -89,9 +89,5 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             throw new ApplicationException();
         }
 
-        public Task<Instance> AddCompleteConfirmation(string app, string org, int instanceOwnerPartyId, Guid instanceGuid)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
