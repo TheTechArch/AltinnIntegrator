@@ -23,7 +23,6 @@ namespace AltinnIntegrator.Functions
         /// </summary>
         public void Configure(IWebJobsBuilder builder)
         {
-            builder.Services.AddLogging();
             builder.Services.AddOptions<AltinnIntegratorSettings>()
             .Configure<IConfiguration>((settings, configuration) =>
             {
@@ -44,13 +43,12 @@ namespace AltinnIntegrator.Functions
             builder.Services.AddTransient<ITelemetryInitializer, TelemetryInitializer>();
             builder.Services.AddTransient<IKeyVaultService, KeyVaultService>();
             builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
-            builder.Services.AddTransient<IQueueService, QueueService>();
-            builder.Services.AddTransient<IAltinnApp, AltinnAppSI>();
-            builder.Services.AddTransient<IPlatform, PlatformSI>();
+            builder.Services.AddSingleton<IQueueService, QueueService>();
             builder.Services.AddSingleton<IStorage, StorageSI>();
+            builder.Services.AddHttpClient<IAltinnApp, AltinnAppSI>();
+            builder.Services.AddHttpClient<IPlatform, PlatformSI>();
             builder.Services.AddHttpClient<IAuthenticationClientWrapper, AuthenticationClientWrapper>();
             builder.Services.AddHttpClient<IMaskinPortenClientWrapper, MaskinportenClientWrapper>();
-            
         }
     }
 }

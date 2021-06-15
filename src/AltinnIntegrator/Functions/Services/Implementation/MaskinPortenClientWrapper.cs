@@ -23,13 +23,14 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationClientWrapper" /> class.
         /// </summary>
-        public MaskinportenClientWrapper(IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, HttpClient httpClient)
+        public MaskinportenClientWrapper(IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, HttpClient httpClient, ILogger<MaskinportenClientWrapper> logger)
         {
             _settings = altinnIntegratorSettings.Value;
             httpClient.BaseAddress = new Uri(_settings.MaskinportenBaseAddress);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
             _client = httpClient;
+            _logger = logger;
         }
 
         /// <summary>
@@ -58,11 +59,10 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             else
             {
                 string error = await response.Content.ReadAsStringAsync();
-                // _logger.LogError( @"Could not retrieve Token" + error);
+                _logger.LogError( @"Could not retrieve Token" + error);
             }
 
             return null;
-            
         }
     }
 }

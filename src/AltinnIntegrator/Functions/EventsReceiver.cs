@@ -2,13 +2,14 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Altinn.Platform.Events.Functions.Models;
+using AltinnIntegrator.Functions.Config;
 using AltinnIntegrator.Functions.Services.Implementation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-
+using Microsoft.Extensions.Options;
 
 namespace Functions
 {
@@ -20,8 +21,10 @@ namespace Functions
     {
         private readonly IQueueService _queueService;
 
-        public EventsReceiver(IQueueService queueSerice)
+        private readonly AltinnIntegratorSettings _settings;
+        public EventsReceiver(IQueueService queueSerice, IOptions<AltinnIntegratorSettings> altinnIntegratorSettings)
         {
+            _settings = altinnIntegratorSettings.Value;
             _queueService = queueSerice;
         }
 
@@ -31,12 +34,12 @@ namespace Functions
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
-
+           
             string name = req.Query["name"];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             CloudEvent cloudEvent = JsonSerializer.Deserialize<CloudEvent>(requestBody);
-
+           
 
             await _queueService.PushToInboundQueue(JsonSerializer.Serialize(cloudEvent));
 

@@ -1,6 +1,7 @@
 ﻿using AltinnIntegrator.Functions.Config;
 using AltinnIntegrator.Functions.Services.Interface;
 using AltinnIntegrator.Functions.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -21,6 +22,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         private readonly AltinnIntegratorSettings _altinnIntegratorSettings;
         private readonly IMaskinPortenClientWrapper _maskinportenClientWrapper;
         private readonly IAuthenticationClientWrapper _authenticationClientWrapper;
+        private readonly ILogger _logger;
         private string _altinnToken;
         private DateTime _tokenTimeout; 
 
@@ -29,18 +31,25 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             IOptions<KeyVaultSettings> keyVaultSettings, 
             IOptions<AltinnIntegratorSettings> altinnIntegratorSettings,
             IMaskinPortenClientWrapper maskinPortenClientWrapper,
-            IAuthenticationClientWrapper authenticationClientWrapper)
+            IAuthenticationClientWrapper authenticationClientWrapper,
+            ILogger<AuthenticationService> logger)
         {
             _keyVaultSettings = keyVaultSettings.Value;
             _altinnIntegratorSettings = altinnIntegratorSettings.Value;
             _keyVaultService = keyVaultService;
             _maskinportenClientWrapper = maskinPortenClientWrapper;
             _authenticationClientWrapper = authenticationClientWrapper;
+            _logger = logger;
         }
 
 
+        /// <summary>
+        /// Creates a altinn token. First login to MaskinPorten and then call altinn to convert to Altinn token.
+        /// </summary>
+        /// <returns>The altinn token</returns>
         public async Task<string> GetAltinnToken()
         {
+            // To reduce traffic we cache this.
             if(!string.IsNullOrEmpty(_altinnToken) && _tokenTimeout > DateTime.Now)
             {
                 return _altinnToken;

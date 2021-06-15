@@ -6,6 +6,7 @@ using Azure;
 using Azure.Identity;
 using Azure.Security.KeyVault.Certificates;
 using Azure.Security.KeyVault.Secrets;
+using Microsoft.Extensions.Logging;
 
 namespace AltinnIntegrator.Functions.Services.Implementation
 {
@@ -16,6 +17,13 @@ namespace AltinnIntegrator.Functions.Services.Implementation
     [ExcludeFromCodeCoverage]
     public class KeyVaultService : IKeyVaultService
     {
+        private readonly ILogger _logger;
+
+        public KeyVaultService(ILogger<KeyVaultService> logger)
+        {
+            _logger = logger;
+        }
+
         /// <inheritdoc/>
         public async Task<string> GetCertificateAsync(string vaultUri, string secretId)
         {

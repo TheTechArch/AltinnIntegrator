@@ -40,7 +40,8 @@ namespace AltinnIntegrator.Functions.Services.Implementation
         public AltinnAppSI(
             IOptions<AltinnIntegratorSettings> altinnIntegratorSettings, 
             HttpClient httpClient, 
-            IAuthenticationService authenticationService
+            IAuthenticationService authenticationService,
+            ILogger<AltinnAppSI> logger
             )
         {
             _settings = altinnIntegratorSettings.Value;
@@ -48,6 +49,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
             _client = httpClient;
             _authenticationService = authenticationService;
+            _logger = logger;
         }
 
         /// <inheritdoc />
@@ -66,7 +68,7 @@ namespace AltinnIntegrator.Functions.Services.Implementation
             }
             else
             {
-                //_logger.LogError($"Unable to fetch instance with instance id {instanceId}");
+                _logger.LogError($"Unable to fetch instance with instance id {instanceId}");
                 throw new ApplicationException();
             }
         }
